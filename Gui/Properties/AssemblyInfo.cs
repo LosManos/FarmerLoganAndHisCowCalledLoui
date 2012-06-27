@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("Gui")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("LIUS")]
 [assembly: AssemblyProduct("Gui")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]

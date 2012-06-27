@@ -2,11 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Gui" GeneratedClassName="Settings1">
   <Profiles />
   <Settings>
-    <Setting Name="MRU01" Type="System.String" Scope="User">
-      <Value Profile="(Default)">asdf</Value>
-    </Setting>
-    <Setting Name="StartCount" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="MRUFileList" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

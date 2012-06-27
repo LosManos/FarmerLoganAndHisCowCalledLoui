@@ -66,23 +66,7 @@ namespace Gui
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            var mruPropertyList = new List<System.Configuration.SettingsProperty>();
-            foreach (System.Configuration.SettingsProperty property in Settings1.Default.Properties)
-            {
-                if (property.Name.StartsWith("MRU"))
-                {
-                    mruPropertyList.Add(property);
-                }
-            }
-            var mruText = string.Join("\r\n", mruPropertyList.OrderBy(p => p.Name).Select(p => p.DefaultValue));
-
-            var startCount = Settings1.Default.StartCount;
-            startCount = startCount + 1;
-            Settings1.Default.StartCount = startCount;
-            Settings1.Default.Save();
-
-            var leadingText = "Context menu is avaiable on the form.  Press the context button, shift F10 or the mouse secondary button.";
-            SetText(leadingText + "\r\n\r\n" + startCount + "\r\n\r\n" + mruText);
+            ShowWelcomeText();
         }
 
         public void CreateFileWatcher(string path)
@@ -185,6 +169,7 @@ namespace Gui
 
                 _viewmodel.SetFileEvent("last written to", File.GetLastWriteTime(_pathFilename));
 
+                //  Below is old code when the main windows was a textbox and not a RTF one.
                 ////  http://stackoverflow.com/questions/4055720/scrolling-to-the-end-of-a-single-line-wpf-textbox
                 //MainTextbox.Focus();
                 //MainTextbox.CaretIndex = MainTextbox.Text.Length;
@@ -217,10 +202,20 @@ namespace Gui
             {
                 _pathFilename = dlg.FileName;
 
+                Settings1.Default.AddUsedFile(_pathFilename);
+
                 ReadFile();
 
                 CreateFileWatcher(System.IO.Path.GetDirectoryName(_pathFilename));
             }
         }
+
+        private void ShowWelcomeText()
+        {
+            var leadingText = "Context menu is available on the form.  Press the context menu button, shift F10 or the mouse secondary button.";
+            var mruText2 = string.Join(Environment.NewLine, Settings1.Default.GetMRUFileList().Select((pf, c) => c.ToString() + " : " + pf.PathFile));
+            SetText(leadingText + "\r\n\r\n" + mruText2);
+        }
+
     }
 }

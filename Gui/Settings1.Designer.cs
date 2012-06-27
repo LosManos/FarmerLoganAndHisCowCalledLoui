@@ -25,25 +25,13 @@ namespace Gui {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("asdf")]
-        public string MRU01 {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MRUFileList {
             get {
-                return ((string)(this["MRU01"]));
+                return ((string)(this["MRUFileList"]));
             }
             set {
-                this["MRU01"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int StartCount {
-            get {
-                return ((int)(this["StartCount"]));
-            }
-            set {
-                this["StartCount"] = value;
+                this["MRUFileList"] = value;
             }
         }
     }
