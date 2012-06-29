@@ -73,6 +73,9 @@ namespace Gui
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
             ShowWelcomeText();
+
+            var mruMenuItem = (MenuItem)FindName("RecentFilesMenu");
+
         }
 
         public void CreateFileWatcher(string path)
@@ -232,6 +235,35 @@ namespace Gui
             var leadingText = "Context menu is available on the form.  Press the context menu button, shift F10 or the mouse secondary button.";
             var mruText2 = string.Join(Environment.NewLine, Settings1.Default.GetMRUFileList().Select((pf, c) => c.ToString() + " : " + pf.PathFile));
             SetText(leadingText + "\r\n\r\n" + mruText2);
+        }
+
+        private void RecentFilesMenu_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            var menu = (MenuItem)e.Source;
+            menu.Items.Clear();
+            var index = 0;
+            Settings1.Default.GetMRUFileList().ForEach( pf =>
+            {
+                var newMenu = new FileMenuItem()
+                {
+                    Header= string.Format( "_{0} : {1}", index, pf.PathFile ), 
+                    Index = index,
+                    Pathfile = pf.PathFile, 
+                    ToolTip = pf.TimeOfOpening
+                };
+                newMenu.Click +=newMenu_Click;
+                menu.Items.Add( newMenu);
+                index += 1;
+            });
+        }
+
+        void newMenu_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = (FileMenuItem)e.Source;
+            _pathFilename = menu.Pathfile;
+            Settings1.Default.AddUsedFile(_pathFilename);
+            ReadFile();
+            CreateFileWatcher(System.IO.Path.GetDirectoryName(_pathFilename));
         }
 
     }

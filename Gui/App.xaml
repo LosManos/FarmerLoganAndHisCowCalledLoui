@@ -3,6 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!--http://stackoverflow.com/questions/4763634/wpf-extending-window-->
+        <!--<Style TargetType="{x:Type Window}">
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <ContextMenu>
+                        <ContextMenu.Items>
+                            <MenuItem Header="Print" Command="Print" />
+                        </ContextMenu.Items>
+                    </ContextMenu>
+                </Setter.Value>
+            </Setter>
+        </Style>-->
     </Application.Resources>
 </Application>

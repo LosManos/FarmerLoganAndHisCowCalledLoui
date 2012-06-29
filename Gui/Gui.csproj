@@ -53,6 +53,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FileMenuItem.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Settings1.cs" />
     <Compile Include="Settings1.Designer.cs">

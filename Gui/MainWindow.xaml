@@ -43,6 +43,10 @@
                     <MenuItem Command="ApplicationCommands.Cut" />
                     <MenuItem Command="ApplicationCommands.Paste" />
                     <Separator/>
+                    <MenuItem Name="RecentFilesMenu" Header="Recent _files" SubmenuOpened="RecentFilesMenu_SubmenuOpened">
+                        <MenuItem Header="place holder"/>
+                    </MenuItem>
+                    <Separator/>
                     <MenuItem Header="E_xit" Click="ContextMenu_Exit_Click">
                         <MenuItem.Icon>
                             <Image Source="Images\Exit.ico"/>
