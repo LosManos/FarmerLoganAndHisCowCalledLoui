@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Gui {
+namespace FarmerLoganAndHisCowCalledLoui.Gui {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

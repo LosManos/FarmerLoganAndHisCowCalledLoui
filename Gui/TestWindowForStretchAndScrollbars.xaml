@@ -1,4 +1,4 @@
-﻿<Window x:Class="Gui.TestWindowForStretchAndScrollbars"
+﻿<Window x:Class="FarmerLoganAndHisCowCalledLoui.Gui.TestWindowForStretchAndScrollbars"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="TestWindowForStretchAndScrollbars" Height="300" Width="300">

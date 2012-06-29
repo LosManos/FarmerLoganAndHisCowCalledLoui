@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Gui {
+namespace FarmerLoganAndHisCowCalledLoui.Gui
+{
     
     
     // This class allows you to handle specific events on the settings class:
@@ -30,6 +31,9 @@ namespace Gui {
             // Add code to handle the SettingsSaving event here.
         }
 
+        /// <summary>This method adds a file to the MRU list and saves it as a user setting.
+        /// </summary>
+        /// <param name="pathfile"></param>
         internal void AddUsedFile(string pathfile)
         {
             AddUsedFile(UseFileInfo.Create(pathfile, DateTime.Now));

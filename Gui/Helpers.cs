@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Gui
+namespace FarmerLoganAndHisCowCalledLoui.Gui
 {
     /// <summary>
     /// http://www.c-sharpcorner.com/UploadFile/chauhan_sonu57/SerializingObjects07202006065806AM/SerializingObjects.aspx

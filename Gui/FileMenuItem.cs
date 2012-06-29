@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Gui
+namespace FarmerLoganAndHisCowCalledLoui.Gui
 {
     class FileMenuItem : MenuItem
     {

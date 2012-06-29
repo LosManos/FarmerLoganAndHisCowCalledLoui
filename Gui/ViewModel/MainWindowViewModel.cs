@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gui
+namespace FarmerLoganAndHisCowCalledLoui.Gui
 {
     partial class MainWindow
     {
