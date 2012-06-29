@@ -61,6 +61,15 @@ namespace Gui
                 {
                     ExitApplication(Ask.DoNotAsk);
                 }
+                if (e.Key == Key.D0)
+                {
+                }
+                if (new List<Key>() {Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D, Key.D6, Key.D7, Key.D8, Key.D9}.Contains(e.Key))
+                {
+                    var ch = e.Key.ToString().ToList().Where(c => char.IsDigit(c)).Single().ToString();
+                    OpenFileFromMRUList(int.Parse( ch));
+                }
+                //  , for settings
             }
         }
 
@@ -135,6 +144,17 @@ namespace Gui
             //  http://stackoverflow.com/questions/2497291/how-do-i-move-the-caret-a-certain-number-of-positions-in-a-wpf-richtextbox
             MainTextbox.CaretPosition = MainTextbox.Document.ContentEnd;
             MainTextbox.Focus();
+        }
+
+        private void OpenFileFromMRUList(int index)
+        {
+            var lst = Settings1.Default.GetMRUFileList();
+            if (index < lst.Count())
+            {
+                _pathFilename = lst[index].PathFile;
+                ReadFile();
+                CreateFileWatcher(System.IO.Path.GetDirectoryName(_pathFilename));
+            }
         }
 
         private void ReadFile()
