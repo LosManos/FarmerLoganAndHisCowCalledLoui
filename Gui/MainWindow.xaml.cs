@@ -35,14 +35,66 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
             base.DataContext = _viewmodel;
         }
 
+        #region Event handlers and overloaded methods.
+
         private void ContextMenu_Exit_Click(object sender, RoutedEventArgs e)
         {
-            ExitApplication( Ask.DoNotAsk);
+            ExitApplication(Ask.DoNotAsk);
         }
 
         private void ContextMenu_OpenFile_Click(object sender, RoutedEventArgs e)
         {
             ShowOpenFileDialogue();
+        }
+
+        private void newMenu_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = (FileMenuItem)e.Source;
+            _pathFilename = menu.Pathfile;
+            Settings1.Default.AddUsedFile(_pathFilename);
+            ReadFile();
+            CreateFileWatcher(System.IO.Path.GetDirectoryName(_pathFilename));
+        }
+
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            // Specify what is done when a file is changed, created, or deleted.
+            //Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+
+            //  http://stackoverflow.com/questions/1270859/wpf-gui-refresh-from-different-thread
+            this.Dispatcher.BeginInvoke(
+                (Action)delegate()
+                {
+                    ReadFile();
+                    _viewmodel.SetFileEvent(e.ChangeType.ToString(), DateTime.Now);
+                    //SetGuiFileEvent(e.ChangeType.ToString());
+                });
+        }
+
+        private static void OnRenamed(object source, RenamedEventArgs e)
+        {
+            // Specify what is done when a file is renamed.
+            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
+        }
+
+        private void RecentFilesMenu_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            var menu = (MenuItem)e.Source;
+            menu.Items.Clear();
+            var index = 0;
+            Settings1.Default.GetMRUFileList().ForEach(pf =>
+            {
+                var newMenu = new FileMenuItem()
+                {
+                    Header = string.Format("_{0} : {1}", index, pf.PathFile),
+                    Index = index,
+                    Pathfile = pf.PathFile,
+                    ToolTip = pf.TimeOfOpening
+                };
+                newMenu.Click += newMenu_Click;
+                menu.Items.Add(newMenu);
+                index += 1;
+            });
         }
 
         private void Window_KeyDown_1(object sender, KeyEventArgs e)
@@ -51,7 +103,7 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
             {
                 ExitApplication(Ask.DoAsk);
             }
-            else if( Keyboard.Modifiers == ModifierKeys.Control )
+            else if (Keyboard.Modifiers == ModifierKeys.Control)
             {
                 if (e.Key == Key.O)
                 {
@@ -61,10 +113,10 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
                 {
                     ExitApplication(Ask.DoNotAsk);
                 }
-                if (new List<Key>() {Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D, Key.D6, Key.D7, Key.D8, Key.D9}.Contains(e.Key))
+                if (new List<Key>() { Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D, Key.D6, Key.D7, Key.D8, Key.D9 }.Contains(e.Key))
                 {
                     var ch = e.Key.ToString().ToList().Where(c => char.IsDigit(c)).Single().ToString();
-                    OpenFileFromMRUList(int.Parse( ch));
+                    OpenFileFromMRUList(int.Parse(ch));
                 }
                 //  , for settings
             }
@@ -77,6 +129,8 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
             var mruMenuItem = (MenuItem)FindName("RecentFilesMenu");
 
         }
+
+        #endregion  //  Event handlers and overloaded methods.
 
         public void CreateFileWatcher(string path)
         {
@@ -100,28 +154,6 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
 
             // Begin watching.
             watcher.EnableRaisingEvents = true;
-        }
-
-        // Define the event handlers.
-        private void OnChanged(object source, FileSystemEventArgs e)
-        {
-            // Specify what is done when a file is changed, created, or deleted.
-            //Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
-
-            //  http://stackoverflow.com/questions/1270859/wpf-gui-refresh-from-different-thread
-            this.Dispatcher.BeginInvoke(
-                (Action)delegate()
-                {
-                    ReadFile();
-                    _viewmodel.SetFileEvent(e.ChangeType.ToString(), DateTime.Now);
-                    //SetGuiFileEvent(e.ChangeType.ToString());
-                });
-        }
-
-        private static void OnRenamed(object source, RenamedEventArgs e)
-        {
-            // Specify what is done when a file is renamed.
-            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
         }
 
         private void ExitApplication(Ask ask)
@@ -199,7 +231,7 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
             }
         }
 
-        public void SetRTFText(string text)
+        private void SetRTFText(string text)
         {
             //  http://stackoverflow.com/questions/1367256/set-rtf-text-into-wpf-richtextbox-control
             MainTextbox.SelectAll();
@@ -235,35 +267,6 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
             var leadingText = "Context menu is available on the form.  Press the context menu button, shift F10 or the mouse secondary button.";
             var mruText2 = string.Join(Environment.NewLine, Settings1.Default.GetMRUFileList().Select((pf, c) => c.ToString() + " : " + pf.PathFile));
             SetText(leadingText + "\r\n\r\n" + mruText2);
-        }
-
-        private void RecentFilesMenu_SubmenuOpened(object sender, RoutedEventArgs e)
-        {
-            var menu = (MenuItem)e.Source;
-            menu.Items.Clear();
-            var index = 0;
-            Settings1.Default.GetMRUFileList().ForEach( pf =>
-            {
-                var newMenu = new FileMenuItem()
-                {
-                    Header= string.Format( "_{0} : {1}", index, pf.PathFile ), 
-                    Index = index,
-                    Pathfile = pf.PathFile, 
-                    ToolTip = pf.TimeOfOpening
-                };
-                newMenu.Click +=newMenu_Click;
-                menu.Items.Add( newMenu);
-                index += 1;
-            });
-        }
-
-        void newMenu_Click(object sender, RoutedEventArgs e)
-        {
-            var menu = (FileMenuItem)e.Source;
-            _pathFilename = menu.Pathfile;
-            Settings1.Default.AddUsedFile(_pathFilename);
-            ReadFile();
-            CreateFileWatcher(System.IO.Path.GetDirectoryName(_pathFilename));
         }
 
     }
