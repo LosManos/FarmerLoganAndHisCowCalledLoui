@@ -22,6 +22,10 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
 
         private string _pathFilename;
 
+        private int _paragraphCount;
+
+        private Dictionary<string, DateTime> _lastWriteTimeList = new Dictionary<string, DateTime>();
+
         private enum Ask
         {
             DoAsk,
@@ -58,23 +62,55 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            // Specify what is done when a file is changed, created, or deleted.
-            //Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+            //  There is a problem with double save events for for instance Notepad.
+            //  http://stackoverflow.com/questions/1764809/filesystemwatcher-changed-event-is-raised-twice
 
-            //  http://stackoverflow.com/questions/1270859/wpf-gui-refresh-from-different-thread
-            this.Dispatcher.BeginInvoke(
-                (Action)delegate()
+            if (IsNewChangedEvent(_lastWriteTimeList, e.FullPath))
+            {
+                //  http://stackoverflow.com/questions/1270859/wpf-gui-refresh-from-different-thread
+                this.Dispatcher.BeginInvoke(
+                    (Action)delegate()
+                    {
+                        ReadFile();
+                        _viewmodel.SetFileEvent(e.ChangeType.ToString(), DateTime.Now);
+                    });
+            }
+        }
+
+        private static bool IsNewChangedEvent(Dictionary<string, DateTime> lastWriteTimeList, string fullPath)
+        {
+            DateTime formerLastWriteTime;
+            if (lastWriteTimeList.TryGetValue(fullPath, out formerLastWriteTime))
+            {
+                if (formerLastWriteTime == File.GetLastWriteTime(fullPath))
+                {   //  We have gotten the event before.
+                    return false;
+                }
+                else
                 {
-                    ReadFile();
-                    _viewmodel.SetFileEvent(e.ChangeType.ToString(), DateTime.Now);
-                    //SetGuiFileEvent(e.ChangeType.ToString());
-                });
+                    lastWriteTimeList[fullPath] = File.GetLastWriteTime(fullPath);
+                    return true;
+                }
+            }
+            else
+            {
+                lastWriteTimeList.Add(fullPath, File.GetLastWriteTime(fullPath));
+                return true;
+            }
+        }
+
+        private void OnCreated(object sender, FileSystemEventArgs e)
+        {
+        }
+
+        private void OnDeleted(object sender, FileSystemEventArgs e)
+        {
         }
 
         private static void OnRenamed(object source, RenamedEventArgs e)
         {
-            // Specify what is done when a file is renamed.
-            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
+            //// Specify what is done when a file is renamed.
+            //Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
         }
 
         private void RecentFilesMenu_SubmenuOpened(object sender, RoutedEventArgs e)
@@ -127,12 +163,11 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
             ShowWelcomeText();
 
             var mruMenuItem = (MenuItem)FindName("RecentFilesMenu");
-
         }
 
         #endregion  //  Event handlers and overloaded methods.
 
-        public void CreateFileWatcher(string path)
+        private void CreateFileWatcher(string path)
         {
             //  http://stackoverflow.com/questions/721714/notification-when-a-file-changes
 
@@ -148,8 +183,8 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
 
             // Add event handlers.
             watcher.Changed += new FileSystemEventHandler(OnChanged);
-            watcher.Created += new FileSystemEventHandler(OnChanged);
-            watcher.Deleted += new FileSystemEventHandler(OnChanged);
+            watcher.Created += new FileSystemEventHandler(OnCreated);
+            watcher.Deleted += new FileSystemEventHandler(OnDeleted);
             watcher.Renamed += new RenamedEventHandler(OnRenamed);
 
             // Begin watching.
@@ -206,13 +241,14 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
                     while ((line = reader.ReadLine()) != null)
                     {
                         sb.Append(line);
-                        sb.Append("\r\n");
+                        sb.Append(Environment.NewLine);
                     }
                 }
 
-                if (sb.Length >= 2)
+                //  Remove the traling newline.
+                if (sb.Length >= Environment.NewLine.Length)
                 {
-                    sb.Remove(sb.Length - 2, 2);
+                    sb.Remove(sb.Length - Environment.NewLine.Length, Environment.NewLine.Length);
                 }
 
                 SetText(sb.ToString());
@@ -241,9 +277,21 @@ namespace FarmerLoganAndHisCowCalledLoui.Gui
 
         private void SetText(string text)
         {
+            var regularColor = Colors.AliceBlue;
+            var newStuffColor = Colors.AntiqueWhite;
             var doc = new FlowDocument();
-            doc.Blocks.Add(new Paragraph(new Run(text)));
+            var textArray = text.Split(new string[]{Environment.NewLine},StringSplitOptions.None);
+            for( int i=0 ; i< textArray.Length ; ++i )
+            {
+                var line = textArray[i];
+                var run = new Run(line);
+                var paragraph = new Paragraph( run );
+                //  http://msdn.microsoft.com/en-us/library/system.windows.media.brush.aspx
+                paragraph.Background = new SolidColorBrush() { Color = ( i < _paragraphCount) ? regularColor :newStuffColor };
+                doc.Blocks.Add(paragraph);
+            }
             MainTextbox.Document = doc;
+            _paragraphCount = textArray.Length;
         }
 
         private void ShowOpenFileDialogue()
